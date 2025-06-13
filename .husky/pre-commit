@@ -1,0 +1,24 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged for optimized linting and formatting
+echo "📝 Linting and formatting staged files..."
+npx lint-staged
+
+# Run type checking
+echo "🔧 Running TypeScript type checking..."
+npm run type-check
+
+# Test build to ensure no build errors
+echo "🏗️  Testing build..."
+npm run build
+
+# If native build exists, test it too
+if [ -d "native" ]; then
+  echo "🔨 Testing native build..."
+  npm run build:native
+fi
+
+echo "✅ All pre-commit checks passed!" 

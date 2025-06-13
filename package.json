@@ -59,10 +59,6 @@
   "devDependencies": {
     "@types/electron": "^1.6.10",
     "@types/node": "^22.9.0",
-    "node-gyp": "^11.2.0",
-    "nodemon": "^3.1.7",
-    "tsx": "^4.19.2",
-    "typescript": "^5.6.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.0",
@@ -71,13 +67,19 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
-    "prettier": "^3.2.4"
+    "node-gyp": "^11.2.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.2.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8",
+    "highlight.js": "^11.11.1",
+    "marked": "^15.0.12",
     "nan": "^2.22.2"
   }
 }

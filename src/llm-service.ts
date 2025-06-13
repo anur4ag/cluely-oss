@@ -17,6 +17,14 @@ interface OpenAIResponse {
   }>;
 }
 
+interface OpenAIStreamChunk {
+  choices: Array<{
+    delta: {
+      content?: string;
+    };
+  }>;
+}
+
 export class LLMService {
   private apiKey: string;
   private model: string;
@@ -44,6 +52,24 @@ export class LLMService {
     } catch (error) {
       console.error('Error calling OpenAI API:', error);
       return this.getErrorResponse(error);
+    }
+  }
+
+  async *sendMessageStream(
+    userMessage: string,
+    screenData?: string
+  ): AsyncGenerator<string, void, unknown> {
+    if (!this.apiKey) {
+      yield this.getMockResponse(userMessage, !!screenData);
+      return;
+    }
+
+    try {
+      const messages = this.buildMessages(userMessage, screenData);
+      yield* this.callOpenAIStream(messages);
+    } catch (error) {
+      console.error('Error calling OpenAI API:', error);
+      yield this.getErrorResponse(error);
     }
   }
 
@@ -104,6 +130,56 @@ export class LLMService {
     );
 
     return response.data;
+  }
+
+  private async *callOpenAIStream(
+    messages: OpenAIMessage[]
+  ): AsyncGenerator<string, void, unknown> {
+    const response = await axios.post(
+      `${this.baseURL}/chat/completions`,
+      {
+        model: this.model,
+        messages,
+        max_tokens: 500,
+        temperature: 0.7,
+        stream: true,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        responseType: 'stream',
+        timeout: 30000,
+      }
+    );
+
+    let buffer = '';
+    const stream = response.data;
+
+    for await (const chunk of stream) {
+      buffer += chunk.toString();
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') {
+            return;
+          }
+          try {
+            const parsed: OpenAIStreamChunk = JSON.parse(data);
+            const content = parsed.choices[0]?.delta?.content;
+            if (content) {
+              yield content;
+            }
+          } catch {
+            // Skip invalid JSON
+          }
+        }
+      }
+    }
   }
 
   private getMockResponse(userMessage: string, hasScreenData: boolean): string {

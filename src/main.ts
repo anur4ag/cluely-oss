@@ -49,6 +49,9 @@ class OverlayApp {
       closable: false,
       focusable: true,
       show: false,
+      // Pure overlay settings - remove from window switcher and dock
+      fullscreenable: false,
+      hiddenInMissionControl: true,
       // Privacy: Exclude from screen capture/sharing
       enableLargerThanScreen: false,
       webPreferences: {
@@ -166,7 +169,7 @@ class OverlayApp {
       this.toggleOverlay();
     });
 
-    // CMD+Enter to initiate chat (when overlay is visible)
+    // CMD+Enter to initiate chat with screen capture (when overlay is visible)
     globalShortcut.register('CommandOrControl+Return', () => {
       if (this.isOverlayVisible) {
         this.initiateChatWithScreenCapture();
@@ -191,6 +194,22 @@ class OverlayApp {
     ipcMain.handle('send-chat-message', async (_event, message: string, screenData?: string) => {
       return await this.sendChatMessage(message, screenData);
     });
+
+    // Handle streaming LLM chat request
+    ipcMain.handle(
+      'send-chat-message-stream',
+      async (event, message: string, screenData?: string) => {
+        try {
+          const streamGenerator = this.llmService.sendMessageStream(message, screenData);
+          for await (const chunk of streamGenerator) {
+            event.sender.send('chat-message-stream-chunk', chunk);
+          }
+          event.sender.send('chat-message-stream-end');
+        } catch (error) {
+          event.sender.send('chat-message-stream-error', error);
+        }
+      }
+    );
 
     // Handle overlay hide request
     ipcMain.handle('hide-overlay', () => {

@@ -69,7 +69,13 @@ class OverlayApp {
     this.configureScreenCaptureExclusion();
 
     // Load the renderer HTML
-    this.overlayWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+    if (process.env['NODE_ENV'] === 'development') {
+      // In development, load from Vite dev server
+      this.overlayWindow.loadURL('http://localhost:3000');
+    } else {
+      // In production, load from built files
+      this.overlayWindow.loadFile(path.join(__dirname, '../renderer/dist/index.html'));
+    }
 
     // Handle window events
     this.overlayWindow.on('blur', () => {

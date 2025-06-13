@@ -6,11 +6,13 @@
   "scripts": {
     "build": "tsc && mv dist/main.js dist/main.cjs && mv dist/preload.js dist/preload.cjs",
     "build:native": "cd native && node-gyp configure && node-gyp build",
-    "build:all": "npm run build && npm run build:native",
+    "build:renderer": "cd renderer && npm run build",
+    "build:all": "npm run build && npm run build:renderer && npm run build:native",
     "dev": "tsx src/index.ts",
     "dev:watch": "nodemon --exec tsx src/index.ts",
+    "dev:renderer": "cd renderer && npm run dev",
     "start": "node dist/index.js",
-    "clean": "rm -rf dist && rm -rf native/build",
+    "clean": "rm -rf dist && rm -rf native/build && cd renderer && rm -rf dist",
     "type-check": "tsc --noEmit",
     "electron": "npm run build && electron .",
     "electron:enhanced": "npm run build:all && electron .",
@@ -42,7 +44,7 @@
     },
     "files": [
       "dist/**/*",
-      "renderer/**/*",
+      "renderer/dist/**/*",
       "node_modules/**/*"
     ],
     "mac": {

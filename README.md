@@ -9,9 +9,12 @@ An intelligent overlay navigation bar for macOS that provides AI-powered assista
 - **🤖 LLM-powered responses** - Get intelligent answers about your screen content
 - **⌨️ Global keyboard shortcuts** - Control from anywhere on your system
 - **🎨 Modern, translucent UI** - Beautiful native macOS design with blur effects
+- **⚛️ React + Vite Frontend** - Modern React-based UI with fast development and builds
+- **🏪 Zustand State Management** - Robust, centralized state management for reliable chat functionality
 - **🚀 TypeScript & Electron** - Built with modern, type-safe technologies
 - **🛡️ Privacy Mode** - Overlay excluded from screen sharing/recording (invisible to others)
 - **🔒 Screen Capture Exclusion** - Native macOS integration to hide from Google Meet, Zoom, etc.
+- **📱 Responsive Design** - Optimized for different screen sizes and overlay configurations
 
 ## 🎯 Use Cases
 
@@ -34,14 +37,17 @@ An intelligent overlay navigation bar for macOS that provides AI-powered assista
 # Clone or download this project
 cd cluelyoss
 
-# Install dependencies
+# Install main dependencies
 npm install
 
+# Install renderer dependencies
+cd renderer && npm install && cd ..
+
 # Build the application
-npm run build
+npm run build:all
 
 # Run the overlay app
-npm run electron
+npm run electron:enhanced
 ```
 
 ### First Time Setup
@@ -89,37 +95,50 @@ npm run electron
 │   ├── preload.ts        # Secure IPC bridge
 │   ├── llm-service.ts    # AI/LLM integration
 │   └── index.ts          # Original TypeScript entry
-├── renderer/
-│   ├── index.html        # Overlay UI
-│   └── renderer.js       # Frontend logic
-├── dist/                 # Compiled output
-├── package.json          # Project configuration
-├── tsconfig.json         # TypeScript configuration
+├── renderer/             # React Frontend (Vite-powered)
+│   ├── src/
+│   │   ├── App.tsx       # Main React component
+│   │   ├── main.tsx      # React app entry point
+│   │   ├── index.css     # Global styles
+│   │   ├── vite-env.d.ts # TypeScript definitions
+│   │   └── store/
+│   │       └── chatStore.ts # Zustand state management
+│   ├── index.html        # Vite template
+│   ├── package.json      # Renderer dependencies
+│   ├── vite.config.ts    # Vite configuration
+│   ├── tsconfig.json     # Renderer TypeScript config
+│   └── dist/             # Built renderer files
+├── dist/                 # Compiled main process
+├── package.json          # Main project configuration
+├── tsconfig.json         # Main TypeScript configuration
 └── README.md            # This file
 ```
 
 ## 🔧 Development Scripts
 
-| Command                     | Description                                  |
-| --------------------------- | -------------------------------------------- |
-| **Building**                |                                              |
-| `npm run build`             | Compile TypeScript to JavaScript             |
-| `npm run build:native`      | Build native modules for enhanced privacy    |
-| `npm run build:all`         | Build everything (TypeScript + native)       |
-| `npm run clean`             | Remove all build artifacts                   |
-| `npm run type-check`        | Type check without building                  |
-| **Running**                 |                                              |
-| `npm run electron`          | Build and run the Electron app (basic)       |
-| `npm run electron:enhanced` | Build and run with enhanced privacy features |
-| `npm run electron:dev`      | Run in development mode                      |
-| `npm run dev`               | Run the original TypeScript project          |
-| `npm run dev:watch`         | Run with file watching                       |
-| **Code Quality**            |                                              |
-| `npm run lint`              | Fix linting issues automatically             |
-| `npm run lint:check`        | Check for linting issues without fixing      |
-| `npm run format`            | Format all files with Prettier               |
-| `npm run format:check`      | Check code formatting without fixing         |
-| `npm run pre-commit`        | Run all pre-commit checks manually           |
+| Command                     | Description                                   |
+| --------------------------- | --------------------------------------------- |
+| **Building**                |                                               |
+| `npm run build`             | Compile main process TypeScript to JavaScript |
+| `npm run build:renderer`    | Build React frontend with Vite                |
+| `npm run build:native`      | Build native modules for enhanced privacy     |
+| `npm run build:all`         | Build everything (main + renderer + native)   |
+| `npm run clean`             | Remove all build artifacts                    |
+| `npm run type-check`        | Type check without building                   |
+| **Development**             |                                               |
+| `npm run dev:renderer`      | Start Vite dev server for frontend            |
+| `npm run electron:dev`      | Run main process in development mode          |
+| `npm run dev`               | Run the original TypeScript project           |
+| `npm run dev:watch`         | Run with file watching                        |
+| **Running**                 |                                               |
+| `npm run electron`          | Build and run the Electron app (basic)        |
+| `npm run electron:enhanced` | Build and run with enhanced privacy features  |
+| **Code Quality**            |                                               |
+| `npm run lint`              | Fix linting issues automatically              |
+| `npm run lint:check`        | Check for linting issues without fixing       |
+| `npm run format`            | Format all files with Prettier                |
+| `npm run format:check`      | Check code formatting without fixing          |
+| `npm run pre-commit`        | Run all pre-commit checks manually            |
 
 ## 🤖 LLM Integration
 
@@ -188,15 +207,33 @@ npm run dist
 
 ### Development Mode
 
-Run with DevTools for debugging:
+For development with hot reload:
 
 ```bash
-NODE_ENV=development npm run electron
+# Terminal 1: Start Vite dev server
+npm run dev:renderer
+
+# Terminal 2: Start Electron in development mode
+NODE_ENV=development npm run electron:dev
+```
+
+For debugging with DevTools:
+
+```bash
+NODE_ENV=development npm run electron:enhanced
 ```
 
 ## 🔧 Code Quality & Development Workflow
 
 This project uses modern development tools to ensure code quality and consistency:
+
+### 🛠️ Tech Stack
+
+- **Frontend**: React + TypeScript + Vite
+- **State Management**: Zustand for robust chat state handling
+- **UI Styling**: CSS with modern features (backdrop-filter, custom properties)
+- **Build Tools**: Vite for fast development and optimized builds
+- **Backend**: Electron with TypeScript
 
 ### 🛠️ Automated Quality Checks
 
@@ -314,7 +351,12 @@ npx husky install && chmod +x .husky/pre-commit .husky/commit-msg
 ├── .eslintrc.json        # Linting rules
 ├── .prettierrc           # Code formatting settings
 ├── .husky/pre-commit     # Git pre-commit hook
-└── .lintstagedrc.json    # Staged files processing
+├── .lintstagedrc.json    # Staged files processing
+├── renderer/
+│   ├── vite.config.ts    # Vite build configuration
+│   ├── tsconfig.json     # Frontend TypeScript config
+│   └── tsconfig.node.json # Node.js types for Vite
+└── tsconfig.json         # Main process TypeScript config
 ```
 
 ## 📄 License

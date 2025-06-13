@@ -114,10 +114,15 @@ class OverlayApp {
 
     try {
       // Try to load the native module for enhanced exclusion
-      let screenPrivacy: any = null;
+      interface ScreenPrivacyModule {
+        isSupported(): boolean;
+        excludeFromCapture(windowHandle: bigint): boolean;
+      }
+
+      let screenPrivacy: ScreenPrivacyModule | undefined;
       try {
         screenPrivacy = require('../native/build/Release/screen_privacy');
-      } catch (error) {
+      } catch {
         console.log('Native module not available, using Electron built-in protection');
       }
 

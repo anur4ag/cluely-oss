@@ -31,7 +31,7 @@
     ],
     "prefer-const": "error",
     "no-var": "error",
-    "no-console": "warn",
+    "no-console": "off",
     "eqeqeq": "error",
     "curly": "error"
   },

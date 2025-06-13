@@ -27,7 +27,7 @@ export class LLMService {
     this.model = process.env['OPENAI_MODEL'] || 'gpt-4o';
 
     if (!this.apiKey) {
-      console.warn('OpenAI API key not found. LLM functionality will use mock responses.');
+      throw new Error('OpenAI API key not found. LLM functionality will use mock responses.');
     }
   }
 

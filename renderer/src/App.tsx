@@ -226,35 +226,64 @@ const App: React.FC = () => {
   const shouldShowChat = messages.length > 0 || isStreaming;
 
   return (
-    <div className="container">
-      <div className={`screen-capture-indicator ${isScreenCaptured ? 'active' : ''}`}></div>
+    <div className="flex flex-col h-full p-2 px-4 bg-black/10 backdrop-blur-sm border border-white/10 rounded-xl">
+      {/* Screen capture indicator */}
+      <div
+        className={`absolute top-1 right-2 w-1.5 h-1.5 bg-red-400 rounded-full ${
+          isScreenCaptured ? 'block animate-pulse-glow' : 'hidden'
+        }`}
+      />
 
-      <div className="input-section">
-        <div className="status-indicator"></div>
+      {/* Input section */}
+      <div className="flex items-center gap-3 min-h-11">
+        {/* Status indicator */}
+        <div className="w-2 h-2 bg-brand-green rounded-full animate-pulse-glow flex-shrink-0" />
+
+        {/* Input field */}
         <input
           ref={inputRef}
           type="text"
-          className="input-field"
+          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none transition-all duration-200 focus:bg-white/10 focus:border-brand-green/50 focus:shadow-[0_0_0_2px_rgba(0,255,136,0.2)] placeholder:text-white/60 disabled:opacity-50 backdrop-blur-sm"
           value={inputValue}
           onChange={e => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={isProcessing}
         />
-        <div className="shortcuts">⌘↩ capture</div>
+
+        {/* Shortcuts */}
+        <div className="text-xs text-white/50 whitespace-nowrap flex-shrink-0">⌘↩ capture</div>
       </div>
 
-      <div className={`loading ${isLoading ? 'visible' : ''}`}>
-        <div className="loading-spinner"></div>
+      {/* Loading indicator */}
+      <div
+        className={`flex items-center gap-2 text-white/70 text-xs px-3 py-2 ${
+          isLoading ? 'flex' : 'hidden'
+        }`}
+      >
+        <div className="w-3 h-3 border-2 border-white/30 border-t-brand-green rounded-full animate-spin" />
         <span>Processing...</span>
       </div>
 
-      <div ref={chatSectionRef} className={`chat-section ${shouldShowChat ? 'visible' : ''}`}>
+      {/* Chat section */}
+      <div
+        ref={chatSectionRef}
+        className={`flex-1 max-h-[300px] overflow-y-auto mt-2 custom-scrollbar ${
+          shouldShowChat ? 'block' : 'hidden'
+        }`}
+      >
         {messages.map(message => (
-          <div key={message.id} className={`chat-message ${message.type}`}>
+          <div
+            key={message.id}
+            className={`rounded-lg p-3 mb-2 text-white text-sm leading-relaxed border-l-[3px] backdrop-blur-sm ${
+              message.type === 'user'
+                ? 'bg-brand-green/5 border-l-brand-green'
+                : 'bg-white/5 border-l-brand-blue'
+            }`}
+          >
             {message.type === 'assistant' ? (
               <div
-                className="markdown-content"
+                className="break-words [&_h1]:mt-2 [&_h1]:mb-1 [&_h1]:text-brand-green [&_h2]:mt-2 [&_h2]:mb-1 [&_h2]:text-brand-green [&_h3]:mt-2 [&_h3]:mb-1 [&_h3]:text-brand-green [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-white/10 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-brand-blue [&_blockquote]:pl-3 [&_blockquote]:my-2 [&_blockquote]:text-white/80 [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1"
                 dangerouslySetInnerHTML={{ __html: parseMarkdown(message.content) }}
               />
             ) : (
@@ -264,11 +293,13 @@ const App: React.FC = () => {
         ))}
 
         {isStreaming && streamContent && (
-          <div className="chat-message assistant">
+          <div className="bg-white/5 border-l-[3px] border-l-brand-blue rounded-lg p-3 mb-2 text-white text-sm leading-relaxed backdrop-blur-sm">
             <div
-              className="markdown-content"
+              className="break-words [&_h1]:mt-2 [&_h1]:mb-1 [&_h1]:text-brand-green [&_h2]:mt-2 [&_h2]:mb-1 [&_h2]:text-brand-green [&_h3]:mt-2 [&_h3]:mb-1 [&_h3]:text-brand-green [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_pre]:bg-white/10 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-2 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-brand-blue [&_blockquote]:pl-3 [&_blockquote]:my-2 [&_blockquote]:text-white/80 [&_ul]:pl-5 [&_ul]:my-2 [&_ol]:pl-5 [&_ol]:my-2 [&_li]:my-1"
               dangerouslySetInnerHTML={{
-                __html: parseMarkdown(streamContent) + '<span class="streaming-cursor">▋</span>',
+                __html:
+                  parseMarkdown(streamContent) +
+                  '<span class="text-brand-green animate-blink">▋</span>',
               }}
             />
           </div>

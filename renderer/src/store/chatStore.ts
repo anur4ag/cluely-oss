@@ -73,16 +73,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
   appendStreamContent: (chunk: string) =>
     set(state => ({ streamContent: state.streamContent + chunk })),
   finishStreaming: () => {
-    const { streamContent, addMessage } = get();
-    if (streamContent.trim()) {
-      addMessage(streamContent, 'assistant');
-    }
+    const { streamContent } = get();
+    const finalContent = streamContent.trim();
+
+    // First clear the streaming state to prevent showing both stream and final message
     set({
       isStreaming: false,
       streamContent: '',
       isLoading: false,
       isProcessing: false,
     });
+
+    // Then add the final message if there's content
+    if (finalContent) {
+      const { addMessage } = get();
+      addMessage(finalContent, 'assistant');
+    }
   },
   clearStreamContent: () => set({ streamContent: '' }),
 
